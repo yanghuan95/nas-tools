@@ -2315,7 +2315,7 @@ class DbHelper:
             return False
 
     @DbPersist(_db)
-    def insert_config_sync_path(self, source, dest, unknown, mode, compatibility, rename, enabled, locating, note=None):
+    def insert_config_sync_path(self, source, dest, unknown, tmdbid, mode, compatibility, rename, enabled, locating, note=None):
         """
         增加目录同步
         """
@@ -2323,6 +2323,7 @@ class DbHelper:
             SOURCE=source,
             DEST=dest,
             UNKNOWN=unknown,
+            TMDBID=tmdbid,
             MODE=mode,
             COMPATIBILITY=int(compatibility),
             RENAME=int(rename),

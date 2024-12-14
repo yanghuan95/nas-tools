@@ -62,6 +62,7 @@ class CONFIGSYNCPATHS(Base):
     SOURCE = Column(Text)
     DEST = Column(Text)
     UNKNOWN = Column(Text)
+    TMDBID = Column(Text)
     MODE = Column(Text)
     COMPATIBILITY = Column(Integer)
     RENAME = Column(Integer)

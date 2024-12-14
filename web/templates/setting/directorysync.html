@@ -80,6 +80,12 @@
                   </div>
                 </div>
                 <div class="datagrid-item">
+                  <div class="datagrid-title">TMDBID</div>
+                  <div class="datagrid-content">
+                    {{ Attr.tmdbid or '' }}
+                  </div>
+                </div>
+                <div class="datagrid-item">
                   <div class="datagrid-title">同步方式</div>
                   <div class="datagrid-content">
                     <span class="badge">{{ Attr.syncmod_name }}</span>
@@ -171,6 +177,17 @@
                          placeholder="留空不转移未识别文件" autocomplete="off">
             </div>
           </div>
+          <div class="col-lg-4">
+            <div class="mb-3">
+              <label class="form-label">TMDB ID <span class="form-help"
+                                                                title="TMDB ID为预先填写的TMBD ID， 会在监听模式下持续按照此ID同步文件"
+                                                                data-bs-toggle="tooltip">?</span></label>
+              <div class="input-group">
+                <input type="text" value="" id="sync_path_tmdbid" class="form-control" placeholder="留空不设置">
+                <button class="btn" type="button" onclick="show_search_tmdbid_modal('sync_path_tmdbid', 'modal-directory')">查询</button>
+              </div>
+            </div>
+          </div>
           <div class="col-lg-6">
             <div class="mb-3">
               <label class="form-label required">同步方式 <span class="form-help"
@@ -230,6 +247,7 @@
     $("#sync_path_from").val('');
     $("#sync_path_to").val('');
     $("#sync_path_unknown").val('');
+    $("#sync_path_tmdbid").val('');
     $("#sync_path_compatibility").prop("checked", false);
     $("#sync_path_rename").prop("checked", true);
     $("#sync_path_enabled").prop("checked", true);
@@ -248,6 +266,7 @@
         $("#sync_path_from").val(sync_item.from);
         $("#sync_path_to").val(sync_item.to);
         $("#sync_path_unknown").val(sync_item.unknown);
+        $("#sync_path_tmdbid").val(sync_item.tmdbid);
         $("#sync_path_syncmod").val(sync_item.syncmod);
         $("#sync_path_compatibility").prop("checked", sync_item.compatibility);
         $("#sync_path_rename").prop("checked", sync_item.rename);

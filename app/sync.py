@@ -12,7 +12,8 @@ from app.filetransfer import FileTransfer
 from app.helper import DbHelper
 from app.utils import PathUtils, ExceptionUtils
 from app.utils.commons import singleton
-from app.utils.types import SyncType
+from app.utils.types import SyncType, MediaType
+from app.media import Media
 from config import RMT_MEDIAEXT
 
 lock = threading.Lock()
@@ -56,6 +57,7 @@ class Sync(object):
         self.init_config()
 
     def init_config(self):
+        self.media = Media()
         self.dbhelper = DbHelper()
         self.filetransfer = FileTransfer()
         self._sync_path_confs = {}
@@ -80,12 +82,15 @@ class Sync(object):
             monpath = sync_conf.SOURCE
             target_path = sync_conf.DEST
             unknown_path = sync_conf.UNKNOWN
+            tmdbid = sync_conf.TMDBID
             # 输出日志
             log_content1, log_content2 = "", ""
             if target_path:
                 log_content1 += f"目的目录：{target_path}，"
             if unknown_path:
                 log_content1 += f"未识别目录：{unknown_path}，"
+            if tmdbid:
+                log_content1 += f"TMDBID: {tmdbid},"
             if rename:
                 log_content2 += "，启用识别和重命名"
             if compatibility:
@@ -105,6 +110,7 @@ class Sync(object):
                 'from': monpath,
                 'to': target_path or "",
                 'unknown': unknown_path or "",
+                "tmdbid": tmdbid or "",
                 'syncmod': syncmode,
                 'syncmod_name': syncmode_enum.value,
                 "compatibility": compatibility,
@@ -251,9 +257,16 @@ class Sync(object):
                             return
                     # 监控根目录下的文件发生变化时直接发走
                     if is_root_path:
+                        tmdb_info = None
+                        tmdbid = sync_path_conf.get('tmdbid')
+                        if tmdbid:
+                            tmdb_info = self.media.get_tmdb_info(mtype=MediaType.TV, tmdbid=tmdbid)
+                            log.info(f"【Sync】{event_path} 监听模式，预先获取TMDB INFO {tmdbid}")
                         ret, ret_msg = self.filetransfer.transfer_media(in_from=SyncType.MON,
                                                                         in_path=event_path,
                                                                         target_dir=target_path,
+                                                                        tmdb_info = tmdb_info,
+                                                                        media_type = MediaType.TV if tmdb_info else None,
                                                                         unknown_dir=unknown_path,
                                                                         rmt_mode=sync_mode)
                         if not ret:
@@ -401,9 +414,16 @@ class Sync(object):
                 for path in PathUtils.get_dir_level1_medias(mon_path, RMT_MEDIAEXT):
                     if PathUtils.is_invalid_path(path):
                         continue
+                    tmdb_info = None
+                    tmdbid = sync_path_conf.get('tmdbid')
+                    if tmdbid:
+                        tmdb_info = self.media.get_tmdb_info(mtype=MediaType.TV, tmdbid=tmdbid)
+                        log.info(f"【Sync】{event_path} 监听模式，预先获取TMDB INFO {tmdbid}")
                     ret, ret_msg = self.filetransfer.transfer_media(in_from=SyncType.MON,
                                                                     in_path=path,
                                                                     target_dir=target_path,
+                                                                    tmdb_info = tmdb_info,
+                                                                    media_type = MediaType.TV if tmdb_info else None,
                                                                     unknown_dir=unknown_path,
                                                                     rmt_mode=sync_mode)
                     if not ret:
@@ -438,13 +458,14 @@ class Sync(object):
         self.init_config()
         return ret
 
-    def insert_sync_path(self, source, dest, unknown, mode, compatibility, rename, enabled, locating, note=None):
+    def insert_sync_path(self, source, dest, unknown, tmdbid, mode, compatibility, rename, enabled, locating, note=None):
         """
         添加同步目录配置
         """
         ret = self.dbhelper.insert_config_sync_path(source=source,
                                                     dest=dest,
                                                     unknown=unknown,
+                                                    tmdbid=tmdbid,
                                                     mode=mode,
                                                     compatibility=compatibility,
                                                     rename=rename,

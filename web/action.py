@@ -1304,6 +1304,7 @@ class WebAction:
         source = data.get("from")
         dest = data.get("to")
         unknown = data.get("unknown")
+        tmdbid = data.get("tmdbid")
         mode = data.get("syncmod")
         compatibility = data.get("compatibility")
         rename = data.get("rename")
@@ -1343,6 +1344,7 @@ class WebAction:
         _sync.insert_sync_path(source=source,
                                dest=dest,
                                unknown=unknown,
+                               tmdbid=tmdbid,
                                mode=mode,
                                compatibility=compatibility,
                                rename=rename,

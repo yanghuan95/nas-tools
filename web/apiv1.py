@@ -2060,6 +2060,7 @@ class SyncDirectoryUpdate(ClientResource):
     parser.add_argument('from', type=str, help='源目录', location='form', required=True)
     parser.add_argument('to', type=str, help='目的目录', location='form')
     parser.add_argument('unknown', type=str, help='未知目录', location='form')
+    parser.add_argument('tmdbid', type=str, help='TMDB ID', location='form')
     parser.add_argument('syncmod', type=str, help='同步模式', location='form')
     parser.add_argument('compatibility', type=str, help='兼容模式', location='form')
     parser.add_argument('rename', type=str, help='重命名', location='form')
